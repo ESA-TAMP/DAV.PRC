@@ -1,0 +1,4 @@
+[submodule "eoxserver"]
+	path = eoxserver
+	url = https://github.com/eoxserver/eoxserver
+	branch = 0.4
