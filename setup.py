@@ -43,6 +43,6 @@ setup(
     author_email="office@eox.at",
     maintainer="EOX IT Services GmbH",
     description="DAV.PRC",
-    long_description=read("README.rst"),
+    long_description=read("README.md"),
     url="https://github.com/ESA-TAMP/DAV.PRC.org"
 )
