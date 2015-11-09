@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# /etc/rc.d/init.d/davprcd
+#
+# <description of the *service*>
+# <any general comments about this init script>
+#
+# <tags -- see below for tag definitions. *Every line* from the top
+# of the file to the end of the tags section must begin with a #
+# character. After the tags section, there should be a blank line.
+# This keeps normal comments in the rest of the file from being
+# mistaken for tags, should they happen to fit the pattern.>
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+SERVICE="davprcd"
+PIDFILE="/var/run/${SERVICE}.pid"
+LOCKFILE="/var/lock/subsys/$SERVICE"
+CONSOLE_LOG="/var/log/${SERVICE}_console.log"
+USER="vagrant"
+
+COMMAND="runuser -s /bin/bash $USER -c 'ulimit -S -c 0 &>/dev/null ; nohup davprc.sh 0<&- &>$CONSOLE_LOG & echo \$!' > $PIDFILE"
+
+start() {
+  echo -n $"starting $SERVICE: "
+  daemon --pidfile="$PIDFILE" "$COMMAND"
+  RETVAL="$?"
+  echo
+  [ "$RETVAL" -eq 0 ] && touch "$LOCKFILE"
+  return "$RETVAL"
+}
+
+stop() {
+  echo -n $"stopping $SERVICE: "
+  killproc -p "$PIDFILE" "$SERVICE"
+  RETVAL="$?"
+  echo
+  [ "$RETVAL" -eq 0 ] && rm -f "$LOCKFILE"
+  return "$RETVAL"
+}
+
+case "$1" in
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  status)
+    status -p "$PIDFILE" "$SERVICE"
+  ;;
+  restart)
+    stop
+    start
+  ;;
+  # reload)
+  #   <cause the service configuration to be reread, either with
+  #   kill -HUP or by restarting the daemons, possibly with
+  #   $0 stop; $0 start>
+  # ;;
+  *)
+    echo "Usage: $SERVICE {start|stop|status|restart"
+    exit 1
+  ;;
+esac
