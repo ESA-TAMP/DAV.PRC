@@ -26,6 +26,7 @@
 #-------------------------------------------------------------------------------
 
 import os
+import glob
 
 from setuptools import setup, find_packages
 
@@ -33,12 +34,17 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+print glob.glob("dav_prc/scripts/*.sh")
 
 setup(
     name="DAV.PRC",
     version="0.0.1",
     packages=find_packages(),
     #install_requires=
+    data_files=(
+        ("/etc/init.d", ["dav_prc/scripts/davprcd"])
+    ),
+    scripts=glob.glob("dav_prc/scripts/*.sh"),
     author="EOX IT Services GmbH",
     author_email="office@eox.at",
     maintainer="EOX IT Services GmbH",

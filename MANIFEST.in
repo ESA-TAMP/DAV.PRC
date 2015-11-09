@@ -1,0 +1,6 @@
+include README.md
+include MANIFEST.in
+graft dav_prc
+include dav_prc/scripts/davprcd
+recursive-include dav_prc *.py *.sh
+recursive-exclude dav_prc *.pyc
