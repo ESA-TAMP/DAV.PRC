@@ -39,9 +39,9 @@ setup(
     version="0.0.1",
     packages=find_packages(),
     #install_requires=
-    data_files=(
-        ("/etc/init.d", ["dav_prc/scripts/davprcd"])
-    ),
+    data_files=[
+        ("/etc/init.d/", ["dav_prc/scripts/davprcd"])
+    ],
     scripts=glob.glob("dav_prc/scripts/*.sh"),
     author="EOX IT Services GmbH",
     author_email="office@eox.at",
