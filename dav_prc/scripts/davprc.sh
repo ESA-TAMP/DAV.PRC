@@ -1,5 +1,5 @@
 INSTANCE_DIR=/srv/dav-prc/
-WATCH_DIR=/srv/dav-prc/data/
+WATCH_DIR=/das-dave_data/mwcs/
 
 pushd $INSTANCE_DIR
 
@@ -17,6 +17,7 @@ inotifywait -m $WATCH_DIR -e create -e delete -e moved_to -e moved_from |
        elif [ $action = "DELETE,ISDIR" ] || [ $action = "MOVED_FROM,ISDIR" ] ; then
            echo "Directory $file deleted."
            python manage.py eoxs_collection_delete -i $file
+           # TODO: delete range-type aswell
        fi
    done
 
