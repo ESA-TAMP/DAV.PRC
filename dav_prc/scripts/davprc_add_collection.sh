@@ -30,5 +30,5 @@ create_rangetype_definition() {
 echo `create_rangetype_definition $COLLECTION $numbands` | python /srv/dav-prc/manage.py eoxs_rangetype_load
 
 python /srv/dav-prc/manage.py eoxs_collection_create -i $COLLECTION
-python /srv/dav-prc/manage.py eoxs_collection_datasource -i MOD07_RETRIEVEDTEMPERATUREPROFILES -s "$1/*/*/*/*/*/*/*.tif"
+python /srv/dav-prc/manage.py eoxs_collection_datasource -i $COLLECTION -s "$1/*/*/*/*/*/*/*.tif" -t "{source}.xml"
 
