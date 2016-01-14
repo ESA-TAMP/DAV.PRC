@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 #
-# Project: DAV.PRC <https://github.com/ESA-TAMP/DAV.PRC.org>
+# Project: DAV.PRC <https://github.com/ESA-TAMP/DAV.PRC>
 # Authors: Fabian Schindler <fabian.schindler@eox.at>
 #
 #-------------------------------------------------------------------------------
@@ -48,5 +48,5 @@ setup(
     maintainer="EOX IT Services GmbH",
     description="DAV.PRC",
     long_description=read("README.md"),
-    url="https://github.com/ESA-TAMP/DAV.PRC.org"
+    url="https://github.com/ESA-TAMP/DAV.PRC"
 )
