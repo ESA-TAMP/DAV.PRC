@@ -1,13 +1,16 @@
 #!/bin/bash
 
 BASEDIR="/das-dave_data/mwcs/"
-alias MANAGE="python /srv/dav-prc/manage.py"
 
 for directory in "$BASEDIR/*/" ; do
     collection="$(basename $directory)"
-    if [ MANAGE eox_id_check $collection -eq 0 ] ; then
+    python /srv/dav-prc/manage.py eoxs_id_check $collection
+    if [ $? -eq 0 ] ; then
+        echo ">> Creating new collection '$collection'"
         davpprc_add_collection.sh "$BASEDIR/$collection"
     fi
 
-    MANAGE eoxs_collection_synchronize -i "$collection"
+    echo ">> Synchronizing collection '$collection'"
+
+    python /srv/dav-prc/manage.py eoxs_collection_synchronize -i "$collection"
 done
