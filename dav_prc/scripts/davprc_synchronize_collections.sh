@@ -3,7 +3,7 @@
 BASEDIR="/das-dave_data/mwcs/"
 
 for directory in "$BASEDIR/*/" ; do
-    collection="$(basename $directory)"
+    collection=$(basename "$directory")
     python /srv/dav-prc/manage.py eoxs_id_check $collection
     if [ $? -eq 0 ] ; then
         echo ">> Creating new collection '$collection'"
