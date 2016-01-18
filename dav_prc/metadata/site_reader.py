@@ -14,7 +14,6 @@ class SiteFormatReader(Component):
 
     def test(self, obj):
         tree = parse(obj)
-        print obj, tree
         return tree is not None and tree.getroot().tag == "site"
 
     def read(self, obj):
@@ -23,7 +22,6 @@ class SiteFormatReader(Component):
             decoder = SiteFormatDecoder(tree)
             location = Point(decoder.longitude, decoder.latitude)
 
-            print decoder.start_times, decoder.end_times
             return {
                 "identifier": decoder.identifier,
                 "location": location,
