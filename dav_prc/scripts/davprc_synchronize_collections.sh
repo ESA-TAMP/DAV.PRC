@@ -1,16 +1,37 @@
 #!/bin/bash
 
-BASEDIR="/das-dave_data/mwcs/"
+BASEDIR="/das-dave_data/mwcs"
 
-for directory in "$BASEDIR/*/" ; do
+# checking all existing folders in the base directory
+for directory in $BASEDIR/*/ ; do
     collection=$(basename "$directory")
+    echo ">> Inspecting collection '$collection'"
+
+    # check if the collection already exists
     python /srv/dav-prc/manage.py eoxs_id_check $collection
     if [ $? -eq 0 ] ; then
+        # if the collection does not yet exist, create a new collection
         echo ">> Creating new collection '$collection'"
-        davpprc_add_collection.sh "$BASEDIR/$collection"
+        davprc_add_collection.sh "$BASEDIR/$collection"
     fi
 
+    # synchronize the collection to see if new datasets need to be created
     echo ">> Synchronizing collection '$collection'"
-
     python /srv/dav-prc/manage.py eoxs_collection_synchronize -i "$collection"
+done
+
+
+# check all registered collections
+output=`python /srv/dav-prc/manage.py eoxs_id_list -s -t DatasetSeries`
+if [[ $output == SpatiaLite* ]] ; then
+    output=`echo "$output" | tail -n +12`
+fi
+
+for identifier in $output ; do
+    # if the collection does not have a folder-counterpart, remove that 
+    # collection and all its contents
+    if [ ! -d "$BASEDIR/$identifier" ] ; then
+        echo ">> Collection '$identifier' was removed. Deleting remnants."
+        python /srv/dav-prc/manage.py eoxs_collection_purge -d -i $identifier
+    fi
 done
