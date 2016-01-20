@@ -12,3 +12,5 @@
 /vagrant/shares/httpd_conf.d/README
 /vagrant/shares/httpd_conf.d/welcome.conf
 /vagrant/shares/httpd_conf.d/wsgi.conf.rpmnew
+
+vagrant/shares/instance/dav_prc_instance/data/config.sqlite

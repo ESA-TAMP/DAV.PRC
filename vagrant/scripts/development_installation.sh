@@ -2,6 +2,7 @@
 
 # allow a custom location to override the default one if needed
 export ROOT=${1:-"/var/dav-prc"}
+export INSTANCE="/srv/dav-prc"
 
 # Locate sudo (when available) for commands requiring the superuser.
 # Allows setup of a custom autoconf instance located in the non-root user-space.
@@ -20,32 +21,18 @@ $SUDO python setup.py develop
 cd "$ROOT/eoxserver"
 $SUDO python setup.py develop --no-deps
 
-# # Configure EOxServer autotest instance
-# cd "$EOX_ROOT/autotest/"
+cd $INSTANCE
 
 # # Prepare DBs
-# python manage.py syncdb --noinput --traceback
-# python manage.py loaddata auth_data.json range_types.json --traceback
+python manage.py syncdb --noinput --traceback
 
-# # Create admin user
-# python manage.py shell 1>/dev/null 2>&1 <<EOF
-# from django.contrib.auth import authenticate
-# from django.contrib.auth.models import User
-# if authenticate(username='admin', password='admin') is None:
-#     User.objects.create_user('admin','office@eox.at','admin')
-# EOF
+# Create admin user
+python manage.py shell 1>/dev/null 2>&1 <<EOF
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+if authenticate(username='admin', password='admin') is None:
+    User.objects.create_user('admin','office@eox.at','admin')
+EOF
 
-# # Collect static files
-# python manage.py collectstatic --noinput
-
-# # Create runtime files
-# touch "$EOX_ROOT/autotest/autotest/logs/eoxserver.log"
-
-# # Load the demonstration if not already present
-# SERIES="MER_FRS_1P_reduced_RGB"
-# python manage.py eoxs_id_check "$SERIES" --type DatasetSeries --traceback \
-#     && python manage.py eoxs_collection_create --type DatasetSeries -i "$SERIES" --traceback
-# for TIF in "$EOX_ROOT/autotest/autotest/data/meris/mosaic_MER_FRS_1P_reduced_RGB/"*.tif
-# do
-#     python manage.py eoxs_dataset_register -r RGB -d "$TIF" -m "${TIF//.tif/.xml}" --collection "$SERIES" --traceback
-# done
+# Collect static files
+python manage.py collectstatic --noinput
