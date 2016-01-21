@@ -9,23 +9,17 @@ from eoxserver.resources.coverages.metadata.interfaces import (
 )
 
 
-class SiteFormatReader(Component):
+class GroundSO2FormatReader(Component):
     implements(MetadataReaderInterface)
 
     def test(self, obj):
         tree = parse(obj)
-        return (
-            tree is not None and
-            tree.find("siteName") is not None and
-            tree.find("siteLongitude") is not None and
-            tree.find("siteLatitude") is not None and
-            tree.find("siteElevation") is not None
-        )
+        return tree is not None and tree.getroot().tag == "groundSO2"
 
     def read(self, obj):
         tree = parse(obj)
         if self.test(tree):
-            decoder = SiteFormatDecoder(tree)
+            decoder = GroundSO2FormatDecoder(tree)
             location = Point(decoder.longitude, decoder.latitude)
 
             return {
@@ -36,19 +30,18 @@ class SiteFormatReader(Component):
                 "coverage_type": "",
                 "size": (decoder.size, 1),
                 "projection": 4326,
-                "begin_time": min(decoder.start_times),
-                "end_time": max(decoder.end_times),
+                "begin_time": min(decoder.times),
+                "end_time": max(decoder.times),
                 "extent": (0, 0, 1, 1),
                 "coverage_type": "dav_prc.models.SiteDataset"
             }
         raise Exception("Could not parse from obj '%r'." % obj)
 
 
-class SiteFormatDecoder(xml.Decoder):
-    identifier = xml.Parameter("siteName/text()", type=str, num=1)
-    latitude = xml.Parameter("siteLatitude/text()", type=float, num=1)
-    longitude = xml.Parameter("siteLongitude/text()", type=float, num=1)
-    elevation = xml.Parameter("siteElevation/text()", type=float, num=1)
-    size = xml.Parameter("count(data/entry)", type=int, num=1)
-    start_times = xml.Parameter("data/entry/timeStart/text()", type=parse_iso8601, num="+")
-    end_times = xml.Parameter("data/entry/timeEnd/text()", type=parse_iso8601, num="+")
+class GroundSO2FormatDecoder(xml.Decoder):
+    identifier = xml.Parameter("@station", type=str, num=1)
+    latitude = xml.Parameter("@latitude", type=float, num=1)
+    longitude = xml.Parameter("@longitude", type=float, num=1)
+    elevation = xml.Parameter("@height", type=float, num=1)
+    size = xml.Parameter("count(dailyAverage)", type=int, num=1)
+    times = xml.Parameter("dailyAverage/@date", type=parse_iso8601, num="+")
