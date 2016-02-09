@@ -14,3 +14,4 @@
 /vagrant/shares/httpd_conf.d/wsgi.conf.rpmnew
 
 vagrant/shares/instance/dav_prc_instance/data/config.sqlite
+vagrant/shares/instance/dav_prc_instance/logs/eoxserver.log

@@ -14,7 +14,13 @@ class SiteFormatReader(Component):
 
     def test(self, obj):
         tree = parse(obj)
-        return tree is not None and tree.getroot().tag == "site"
+        return (
+            tree is not None and
+            tree.find("siteName") is not None and
+            tree.find("siteLongitude") is not None and
+            tree.find("siteLatitude") is not None and
+            tree.find("siteElevation") is not None
+        )
 
     def read(self, obj):
         tree = parse(obj)
