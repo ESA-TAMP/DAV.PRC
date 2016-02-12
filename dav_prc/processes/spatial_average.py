@@ -25,15 +25,12 @@
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
 
-import sys
-sys.path.append('/home/tamp/pep.lib/scripts/')
-
-import tampProcessingUtilities as tpu
 
 import os 
 from uuid import uuid4
 import os.path
 import base64
+from subprocess import CalledProcessError, check_output, Popen
 
 import datetime as dt
 import time
@@ -75,28 +72,43 @@ CRSS = (
 )
 
 
-class spatial_average(Component):
+pep_path = '/home/tamp/pep.lib/scripts/tampProcessingUtilities.py'
+
+
+class execute_pep_process(Component):
     """ Process to calcuate coverage spatial average
     """
     implements(ProcessInterface)
 
-    identifier = "spatial_average"
-    title = "Calculate spatial average for coverage"
+    identifier = "execute_pep_process"
+    title = "Execute process of the PEP Library"
     metadata = {"test-metadata":"http://www.metadata.com/test-metadata"}
     profiles = ["test_profile"]
 
     inputs = [
         ("coverage", LiteralData('coverage', str, optional=False,
-            abstract="ID for coverage to compute average",
+            abstract="ID of coverage to be used in processing",
         )),
-        ("begin_time", LiteralData('begin_time', dt.datetime, optional=False,
+        ("process", LiteralData('process', str, optional=False,
+            abstract="PEP Process to be called by request",
+        )),
+        ("begin_time", LiteralData('begin_time', str, optional=False,
             abstract="Start of the time interval",
         )),
-        ("end_time", LiteralData('end_time', dt.datetime, optional=False,
-            abstract="End of the time interval",
+        ("end_time", LiteralData('end_time', str, optional=True,
+            default=None, abstract="End of the time interval",
         )),
-        ("bbox", BoundingBoxData("bbox", crss=CRSS, optional=True,
-            default=None,
+        ("bbox", BoundingBoxData("bbox", crss=CRSS, optional=False,
+            abstract="Bounding Box used for computation",
+        )),
+        ("o_coverage", LiteralData('o_coverage', str, optional=True,
+            default=None, abstract="ID for coverage to be used in band combination",
+        )),
+        ("gain", LiteralData('gain', str, optional=True,
+            default=None, abstract="Gain factor for unit conversion",
+        )),
+        ("offset", LiteralData('offset', str, optional=True,
+            default=None, abstract="Offset factor for unit conversion",
         )),
     ]
 
@@ -106,18 +118,43 @@ class spatial_average(Component):
             abstract="Average of coverage"
         )),
     ]
+    
+    #outputs = [
+    #    ("output",
+    #        ComplexData('output',
+    #            title="PEP Process result",
+    #            abstract="Returns the PEP process call results",
+    #            formats=FormatText('text/plain')
+    #        )
+    #    ),
+    #]
 
-    def execute(self, coverage, begin_time, end_time, bbox, **kwarg):
+    def execute(self, coverage, process, begin_time, end_time, bbox,
+                o_coverage, gain, offset, **kwarg):
+
         outputs = {}
 
-        #bbox.lower[0],bbox.upper[0]
-        #bbox.lower[1],bbox.upper[1]
+        cmd_args = ['python', pep_path, process,
+                    '-c', 'ALARO_Surface_pressure_surface_4326_0059882',
+                    '-u', str(bbox.upper[1]), '-d', str(bbox.lower[1]),
+                    '-l', str(bbox.lower[0]), '-r', str(bbox.upper[0]),
+                    '-s', str(1368576000)]
 
-        outputs['output'] = tpu.spatialAverage("ALARO_Surface_pressure_surface_4326_0059882",
-                            bbox.lower[0],bbox.lower[1],
-                            bbox.upper[0],bbox.upper[1],
-                            1368576000
-        )
+        if end_time:
+            cmd_args.extend(['-e',str(end_time)])
+
+        if o_coverage:
+            cmd_args.extend(['-o',o_coverage])
+
+        if gain:
+            cmd_args.extend(['--gain',str(gain)])
+
+        if offset:
+            cmd_args.extend(['--offset',offset])
+
+        result = check_output(cmd_args)
+        outputs['output'] = result
+
 
         return outputs
 
