@@ -3,9 +3,10 @@ from eoxserver.resources.coverages import admin
 from dav_prc import models
 
 
-
 class SiteDatasetAdmin(admin.CoverageAdmin):
     model = models.SiteDataset
+
+    inlines = (admin.DataItemInline, admin.CollectionInline)
 
     fieldsets = (
         (None, {
