@@ -226,7 +226,8 @@ COMPONENTS = (
     'eoxserver.services.gdal.**',
     'eoxserver.services.mapserver.**',
 
-    'dav_prc.metadata.**'
+    'dav_prc.metadata.**',
+    'dav_prc.ows.**'
 )
 
 
