@@ -95,7 +95,7 @@ class SiteRenderer(Component):
 
         band = range_type[0]
         if not rangesubset or band in rangesubset:
-            data = map(float, root.xpath("data/entry/value/text()"))
+            data = map(float, root.xpath("data/value/text()"))
             print data, root
             data = data[int(subset.low):int(subset.high)]
             output_data[band.identifier] = data
