@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BASEDIR="/das-dave_data/mwcs"
-SITE_BASEDIR="/das-dave_data/groundMeasurements"
+BASEDIR="/tamplocal/das-dave/mwcs"
+SITE_BASEDIR="/tamplocal/das-dave/groundMeasurements"
 
 # checking all existing folders in the base directory
 for directory in `ls $BASEDIR` ; do

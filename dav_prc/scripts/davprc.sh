@@ -1,5 +1,5 @@
 INSTANCE_DIR=/srv/dav-prc/
-WATCH_DIR=/das-dave_data/mwcs/
+WATCH_DIR=/tamplocal/das-dave/mwcs/
 
 pushd $INSTANCE_DIR
 
