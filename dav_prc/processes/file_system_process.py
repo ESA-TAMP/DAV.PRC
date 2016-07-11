@@ -123,10 +123,8 @@ class execute_file_system(Component):
 
 
     outputs = [
-        ("output", ComplexData(
-            "output", title="The processing result", formats=(
-                FormatBinaryRaw("image/tiff"),
-            )
+        ("output", LiteralData('output', str,
+            abstract="pep Processing result"
         )),
     ]
     
@@ -148,12 +146,9 @@ class execute_file_system(Component):
             cmd_args.extend(['--offset',offset])
 
 
-        result_path = check_output(cmd_args)
+        result = check_output(cmd_args)
+        outputs['output'] = result
 
-        # open file
-        with open(result_path, "rb") as fid:
-            filedata = fid.read()
 
-        outputs['output'] = filedata
         return outputs
 
