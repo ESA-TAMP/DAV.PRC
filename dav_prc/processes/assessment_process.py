@@ -40,8 +40,6 @@ from itertools import izip
 from lxml import etree
 from StringIO import StringIO
 
-
-
 from eoxserver.core import Component, implements
 from eoxserver.services.ows.wps.interfaces import ProcessInterface
 from eoxserver.services.ows.wps.exceptions import InvalidOutputDefError
@@ -73,7 +71,7 @@ CRSS = (
 )
 
 
-pep_path = '/home/tamp/pep.lib/scripts/tampProcessingUtilities.py'
+pep_path = '/home/tamp/pep.lib/scripts/tampDataAssessmentUtility.py'
 
 
 class execute_pep_process(Component):
@@ -81,39 +79,58 @@ class execute_pep_process(Component):
     """
     implements(ProcessInterface)
 
-    identifier = "execute"
-    title = "Execute process of the PEP Library"
+    identifier = "execute_assessment"
+    title = "Execute assessment process of the PEP Library"
     metadata = {"test-metadata":"http://www.metadata.com/test-metadata"}
     profiles = ["test_profile"]
 
 
+
+# usage: tampDataAssessmentUtility.py [-h] -c COVERAGE [-g GROUND_PRODUCT] -u
+#                                     UR_LAT -d LL_LAT -l LL_LON -r UR_LON -s
+#                                     T_S [-e T_E] [--spatialtolerance degree]
+#                                     [--temporaltolerance mins]
+#                                     FUNCTION
+
+# Utility used to provide results "on-the-fly" between wcs data and ground db
+# data
+
+# optional arguments:
+#   -h, --help            show this help message and exit
+
 # Required function:
-#   FUNCTION            Available functions are: spatialAverage, temporalAverage, conversion, add, subtract
+#   FUNCTION              Available functions are: correlation
 
 # Coverage required options:
-#   -c COVERAGE         CoverageID to search in wcs server
-#   -o SECOND_COVERAGE  Second coverageID to search in wcs server, used in band
-#                       combination function (add, subtract)
-#   -u UR_LAT           Upper latitude
-#   -d LL_LAT           Lower latitude
-#   -l LL_LON           Far west latitude
-#   -r UR_LON           Far east latitude
-#   -s T_S              Start time/date expressed in Unix Timestamp
-#   -e T_E              End time/date expressed in Unix Timestamp
+#   -c COVERAGE           CoverageID to search in wcs server
+#   -g GROUND_PRODUCT     Ground product to search in DB, used in correlation
+#                         function
+#   -u UR_LAT             Upper latitude
+#   -d LL_LAT             Lower latitude
+#   -l LL_LON             Far west latitude
+#   -r UR_LON             Far east latitude
+#   -s T_S                Start time/date expressed in Unix Timestamp
+#   -e T_E                End time/date expressed in Unix Timestamp
 
-# Function 'convert' optional arguments. (Result = (coverage_ID+offset)*gain):
-#   --gain val          Apply the gain in conversion function, default 1
-#   --offset val        Apply the offset in conversion function, default 0
+# Function 'correlation' optional arguments:
+#   --spatialtolerance degree
+#                         Apply the spatialtolerance in correlation function,
+#                         default 1 degree
+#   --temporaltolerance mins
+#                         Apply the temporaltolerance in correlation function,
+#                         default 60 mins
+
+
 
     inputs = [
         ("process", LiteralData('process', str, optional=False,
-            abstract="PEP Process to be called by request; Available functions are: spatialAverage, temporalAverage, conversion, add, subtract",
+            abstract="Assesment functions; Available functions are: correlation",
         )),
         ("collection", LiteralData('collection', str, optional=False,
             abstract="CoverageID to search in wcs server",
         )),
-        ("o_collection", LiteralData('o_collection', str, optional=True,
-            abstract="(collection name, to be used in case of bandCombination2D function",
+        ("ground_product", LiteralData('ground_product', str, optional=False,
+            abstract="Ground product to search in DB",
         )),
         ("bbox", BoundingBoxData("bbox", crss=CRSS, optional=False,
             abstract="Bounding Box used for computation",
@@ -121,14 +138,14 @@ class execute_pep_process(Component):
         ("start_time", LiteralData('start_time', str, optional=False,
             abstract="Start time/date expressed in Unix Timestamp",
         )),
-        ("end_time", LiteralData('end_time', str, optional=False,
+        ("end_time", LiteralData('end_time', str, optional=True,
             default=None, abstract="End time/date expressed in Unix Timestamp",
         )),
-        ("gain", LiteralData('gain', str, optional=True,
-            default=None, abstract="The gain factor (needed only for conversion unit function) (--gain)",
+        ("spatialtolerance", LiteralData('spatialtolerance', str, optional=True,
+            default=None, abstract="Apply the spatialtolerance in correlation function, default 1 degree",
         )),
-        ("offset", LiteralData('offset', str, optional=True,
-            default=None, abstract="The offset factor (needed only for conversion unit function) (--offset)",
+        ("temporaltolerance", LiteralData('temporaltolerance', str, optional=True,
+            default=None, abstract="Apply the temporaltolerance in correlation function, default 60 mins",
         )),
     ]
 
@@ -140,28 +157,26 @@ class execute_pep_process(Component):
     ]
     
 
-    def execute(self, process, collection, o_collection, bbox, start_time,
-                end_time, gain, offset, **kwarg):
+    def execute(self, process, collection, ground_product, bbox, start_time, 
+                end_time,  spatialtolerance, temporaltolerance, **kwarg):
 
         outputs = {}
 
         cmd_args = [
             'python', pep_path, process,
             '-c', collection,
+            '-g', ground_product,
             '-u', str(bbox.upper[1]), '-d', str(bbox.lower[1]),
             '-l', str(bbox.lower[0]), '-r', str(bbox.upper[0]),
-            '-s', str(start_time),
-            '-e', str(end_time),
+            '-s', start_time,
+            '-e',str(end_time)
         ]
 
-        if o_collection:
-            cmd_args.extend(['-o', o_collection])
+        if spatialtolerance:
+            cmd_args.extend(['--spatialtolerance',spatialtolerance])
 
-        if gain:
-            cmd_args.extend(['--gain', str(gain)])
-
-        if offset:
-            cmd_args.extend(['--offset', str(offset)])
+        if temporaltolerance:
+            cmd_args.extend(['--temporaltolerance',temporaltolerance])
 
         result = check_output(cmd_args)
         outputs['output'] = result
