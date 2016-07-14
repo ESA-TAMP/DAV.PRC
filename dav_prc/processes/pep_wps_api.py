@@ -165,7 +165,7 @@ class execute_pep_process(Component):
         if offset:
             cmd_args.extend(['--offset', str(offset)])
 
-        result_path = check_output(cmd_args)
+        result_path = check_output(cmd_args).strip()
 
         # open file
         with open(result_path, "rb") as fid:
