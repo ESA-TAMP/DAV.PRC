@@ -178,7 +178,7 @@ class execute_pep_process(Component):
             cmd_args.extend(['-o',o_collection])
 
         if ground_product:
-            cmd_args.extend(['-g',ground_product])
+            cmd_args.extend(['-g', ( '"%s"' % ground_product)])
 
         if spatialtolerance:
             cmd_args.extend(['--spatialtolerance',spatialtolerance])
