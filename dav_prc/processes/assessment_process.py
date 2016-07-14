@@ -129,6 +129,9 @@ class execute_pep_process(Component):
         ("collection", LiteralData('collection', str, optional=False,
             abstract="CoverageID to search in wcs server",
         )),
+        ("o_collection", LiteralData('o_collection', str, optional=True,
+            abstract="(collection name, to be used in case of combination functions",
+        )),
         ("ground_product", LiteralData('ground_product', str, optional=False,
             abstract="Ground product to search in DB",
         )),
@@ -157,7 +160,7 @@ class execute_pep_process(Component):
     ]
     
 
-    def execute(self, process, collection, ground_product, bbox, start_time, 
+    def execute(self, process, collection, o_collection, ground_product, bbox, start_time, 
                 end_time,  spatialtolerance, temporaltolerance, **kwarg):
 
         outputs = {}
@@ -165,18 +168,24 @@ class execute_pep_process(Component):
         cmd_args = [
             'python', pep_path, process,
             '-c', collection,
-            '-g', ground_product,
             '-u', str(bbox.upper[1]), '-d', str(bbox.lower[1]),
             '-l', str(bbox.lower[0]), '-r', str(bbox.upper[0]),
             '-s', start_time,
             '-e',str(end_time)
         ]
 
+        if o_collection:
+            cmd_args.extend(['-o',o_collection])
+
+        if ground_product:
+            cmd_args.extend(['-g',ground_product])
+
         if spatialtolerance:
             cmd_args.extend(['--spatialtolerance',spatialtolerance])
 
         if temporaltolerance:
             cmd_args.extend(['--temporaltolerance',temporaltolerance])
+
 
         result = check_output(cmd_args)
         outputs['output'] = result

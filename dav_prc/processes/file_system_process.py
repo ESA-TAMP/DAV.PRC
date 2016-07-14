@@ -134,10 +134,12 @@ class execute_file_system(Component):
 
         outputs = {}
 
-        cmd_args = ['python', pep_path, process,
+        cmd_args = ['python', pep_path,
+                    '-f', process,
                     '-l', label,
                     '-c', collection,
-                    '-n', name ]
+                    '-n', name,
+                    '-u', value ]
 
         if gain:
             cmd_args.extend(['--gain',str(gain)])
