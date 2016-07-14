@@ -139,6 +139,11 @@ class execute_pep_process(Component):
                 FormatBinaryRaw("image/tiff"),
             )
         )),
+        ,
+        ("result", LiteralData(
+            "result", str, title="Direct process result",
+            abstract="Value returned by process"
+        )),
     ]
     
 
@@ -165,13 +170,16 @@ class execute_pep_process(Component):
         if offset:
             cmd_args.extend(['--offset', str(offset)])
 
-        result_path = check_output(cmd_args).strip()
+        result = check_output(cmd_args).strip()
 
-        # open file
-        with open(result_path, "rb") as fid:
-            filedata = fid.read()
+        if os.path.isfile(result):
+            # open file
+            with open(result, "rb") as fid:
+                filedata = fid.read()
 
-        outputs['output'] = filedata
+            outputs['output'] = filedata
+        else:
+            outputs['output'] = result
 
         return outputs
 
