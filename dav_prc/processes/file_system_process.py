@@ -66,7 +66,7 @@ class execute_file_system(Component):
     profiles = ["test_profile"]
 
 
-# Usage, in folder “/home/tamp/pep.lib/scripts”:
+# Usage, in folder "/home/tamp/pep.lib/scripts":
 
 # usage: FilesystemData.py [-h] [--standalone] -f func -l label [-c coverage]
 #                          [-n name] -u value [-i dir] [-o dir] [--gain val]
@@ -145,7 +145,7 @@ class execute_file_system(Component):
             cmd_args.extend(['--gain',str(gain)])
 
         if offset:
-            cmd_args.extend(['--offset',offset])
+            cmd_args.extend(['--offset', str(offset)])
 
 
         result = check_output(cmd_args)
