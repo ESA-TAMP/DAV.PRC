@@ -139,11 +139,6 @@ class execute_pep_process(Component):
                 FormatBinaryRaw("image/tiff"),
             )
         )),
-        ,
-        ("result", LiteralData(
-            "result", str, title="Direct process result",
-            abstract="Value returned by process"
-        )),
     ]
     
 
