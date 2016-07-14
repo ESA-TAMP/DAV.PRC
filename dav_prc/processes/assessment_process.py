@@ -132,7 +132,7 @@ class execute_pep_process(Component):
         ("o_collection", LiteralData('o_collection', str, optional=True,
             abstract="(collection name, to be used in case of combination functions",
         )),
-        ("ground_product", LiteralData('ground_product', str, optional=False,
+        ("ground_product", LiteralData('ground_product', str, optional=True,
             abstract="Ground product to search in DB",
         )),
         ("bbox", BoundingBoxData("bbox", crss=CRSS, optional=False,
