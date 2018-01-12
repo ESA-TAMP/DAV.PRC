@@ -32,7 +32,6 @@ class DAVPRCGDALMetadataFormatReader(Component):
 
         #assert(len(parts) >= 8)
         parts = path.split("/")[-7:]
-        parts remove 1 charcater
 
         out_date = []
         for i in parts[1:4]:
