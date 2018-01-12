@@ -32,11 +32,25 @@ class DAVPRCGDALMetadataFormatReader(Component):
 
         #assert(len(parts) >= 8)
         parts = path.split("/")[-7:]
+        parts remove 1 charcater
 
-        raw_time = parts[4]
+        out_date = []
+        for i in parts[1:4]:
+            try:
+                out_date.append(int(i))
+            except:
+                out_date.append(int(i[1:]))
+
+        try:
+            raw_date = [
+                int(i[1:]) if i[0].isalpha() else int(i) for i in parts[1:4]
+            ]
+            raw_time = parts[4][1:] if parts[4].startswith("T") else parts[4]
+        except Exception as e:
+            raise TypeError("Timestring in file path can't be parsed: %s" % e)
 
         timestamp = datetime.combine(
-            date(*map(int, parts[1:4])),
+            date(*raw_date),
             time(int(raw_time[:2]), int(raw_time[2:4]), int(raw_time[4:]))
         )
         timestamp = make_aware(timestamp, utc)
